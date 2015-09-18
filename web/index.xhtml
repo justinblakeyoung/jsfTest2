@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <h:head>
+        <title>Facelet Title</title>
+        <script type="text/javascript">
+            function handleEdit(xhr, status,args){
+                if(!args.validationFailed){
+                    EDT_WGT.hide();
+                }
+            }
+        </script>
+    </h:head>
+    <h:body>
+        <h:form id="PEOPLE_FRM">
+            <h:panelGrid columns="3" cellspacing="5px">
+                <p:commandButton value="Add" actionListener="#{formBean.initiateNewPeople}" update=":PEOPLE_EDT_FRM:WRAPPER" oncomplete="EDT_WGT.show()"/>
+                <p:commandButton id="EDT_BTN" value="Edit" disabled="#{formBean.applicant eq null}"/>
+                <p:commandButton value="Remove"/>
+            </h:panelGrid>
+            <p:dataTable id="PEOPLE_LST" value="#{formBean.form.applicants}" var="applicant" 
+                          >
+                
+                <p:column headerText="Full Name">
+                    <h:outputText value="#{applicant.firstName}"/>
+                </p:column>
+                <p:column headerText="Sex">
+                    <h:outputLabel value="#{applicant.sex eq 'M' ? 'Male' : 'Female'}"/>
+                </p:column>
+                <p:column headerText="DOB">
+                    <h:outputText value="#{applicant.dob}">
+                        <f:convertDateTime type="date" pattern="MM/dd/yy"/>
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <h:form id="PEOPLE_EDT_FRM">
+            <p:dialog widgetVar="EDT_WGT" id="EDT_DIAG" header="People Detail" closable="true" modal="true">
+                <h:panelGrid id="WRAPPER">
+                    <ui:fragment rendered="#{formBean.applicant ne null}">
+                        <h:panelGrid columns="3" id="EDT_PANE">
+                            <h:outputLabel value="First Name"/>
+                            <p:inputText id="FN" value="#{formBean.applicant.firstName}" required="true" requiredMessage="Pleae provide first name"/>
+                            <p:message for="FN"/>
+
+                            <h:outputLabel value="Sex"/>
+                            <p:selectOneMenu id="SEX" value="#{formBean.applicant.sex}" required="true">
+                                <f:selectItem itemValue="#{null}" itemLabel="Plesel Select A value"/>
+                                <f:selectItem itemLabel="Male" itemValue="M"/>
+                                <f:selectItem itemLabel="Female" itemValue="F"/>
+                            </p:selectOneMenu>
+                            <p:message for="SEX"/>
+
+                            <h:outputLabel value="DOB"/>
+                            <p:calendar id="DOB" value="#{formBean.applicant.dob}" required="true" requiredMessage="Pleae provide first name"/>
+                            <p:message for="DOB"/>
+
+                        </h:panelGrid>
+                    </ui:fragment>
+
+                    <h:panelGrid columns="2">
+                        <p:commandButton value="OK" actionListener="#{formBean.commitPeople}" update="EDT_PANE :PEOPLE_FRM:PEOPLE_LST" 
+                                         oncomplete="handleEdit(xhr, status,args)"/>
+                        <p:commandButton value="Cancel"/>
+                    </h:panelGrid>
+                </h:panelGrid>
+
+            </p:dialog>
+        </h:form>
+    </h:body>
+</html>
+
