@@ -6,7 +6,7 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets">
     <h:head>
-        <title>Facelet Title</title>
+        <title>JSF Test 2</title>
         <script type="text/javascript">
             function handleEdit(xhr, status, args) {
                 if (!args.validationFailed) {
@@ -75,7 +75,7 @@
                         <f:param name="ID" value="#{applicant.firstName}"/>
                     </p:commandButton>
                     <p:commandButton value="Remove" actionListener="#{formBean.deleteApplicant}" update=":PEOPLE_FRM" ajax="true">
-                        <f:param name ="ID" value="#{applicant.firstName}"/>                    
+                        <f:param name ="ID" value="#{applicant.hashCode()}"/>                    
                     </p:commandButton>
                 </p:column>
             </p:dataTable>

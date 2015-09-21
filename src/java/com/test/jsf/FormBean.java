@@ -59,12 +59,13 @@ public class FormBean implements Serializable {
         this.applicant = applicant;
     }
 
+    /*
     public void onDateSelected(SelectEvent event) {
         LOG.log(Level.INFO, "Made it to onDateSelect");
         FacesContext facesContext = FacesContext.getCurrentInstance();
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
         facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Date Selected", format.format(event.getObject())));
-    }
+    }*/
    
 
     public void initiateNewPeople(ActionEvent event) {
@@ -94,9 +95,9 @@ public class FormBean implements Serializable {
     
     public void deleteApplicant(ActionEvent event){
         String id = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("ID");
-        LOG.log(Level.INFO, "Deleting applicant with row ID:  {0}", id);
+        LOG.log(Level.INFO, "Deleting applicant with rows ID:  {0}", id);
         for(People p : this.form.getApplicants()){
-            if(p.getFirstName().equalsIgnoreCase(id)){
+            if(Long.toString(p.hashCode()).equals(id)){
                 this.form.deletePeople(p);
                 this.applicant = null;
                 break;
