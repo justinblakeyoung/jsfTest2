@@ -65,6 +65,7 @@ public class FormBean implements Serializable {
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
         facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Date Selected", format.format(event.getObject())));
     }
+   
 
     public void initiateNewPeople(ActionEvent event) {
         String mode = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("EDT_MODE");
@@ -82,6 +83,25 @@ public class FormBean implements Serializable {
     public void initEdit(ActionEvent event){
         String id = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("ID");
         LOG.log(Level.INFO, "Editing applicant with row ID:  {0}", id);
+        this.addingpersonMode = false;
+        for(People p : this.form.getApplicants()){
+            if(p.getFirstName().equalsIgnoreCase(id)){
+                this.applicant = p;
+                break;
+            }
+        }
+    }
+    
+    public void deleteApplicant(ActionEvent event){
+        String id = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("ID");
+        LOG.log(Level.INFO, "Deleting applicant with row ID:  {0}", id);
+        for(People p : this.form.getApplicants()){
+            if(p.getFirstName().equalsIgnoreCase(id)){
+                this.form.deletePeople(p);
+                this.applicant = null;
+                break;
+            }
+        }
     }
 
     public void commitPeople(ActionEvent event) {

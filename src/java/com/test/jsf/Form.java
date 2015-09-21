@@ -52,5 +52,9 @@ public class Form {
 
         this.applicants.add(p);
     }
+    
+    public void deletePeople(People p){
+        this.applicants.remove(p);
+    }
 
 }

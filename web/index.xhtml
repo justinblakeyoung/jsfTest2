@@ -26,14 +26,19 @@
                     <f:param name="EDT_MODE" value="UPDATE"/>
                 </p:commandButton>
                 <p:commandButton id="RM_BTN" value="Remove" disabled="#{formBean.applicant eq null}"/>
+                
             </h:panelGrid>
             <p:dataTable id="PEOPLE_LST" value="#{formBean.form.applicants}" var="applicant" 
-                         selectionMode="single" selection="#{formBean.applicant}" rowKey="#{applicant.firstName}"
+                         selectionMode="single" selection="#{formBean.applicant}" rowKey="#{applicant.hashCode()}"
                          >
                 <p:ajax event="rowSelect" update=":PEOPLE_FRM:EDT_BTN :PEOPLE_FRM:RM_BTN"/>
                 <p:column headerText="Full Name">
                     <p:cellEditor>
-                        <f:facet name="output"><h:outputText value="#{applicant.firstName}" /></f:facet>
+                        <f:facet name="output">
+                            <h:outputText value="#{applicant}" >
+                                <f:converter converterId="PeopleNameConverter"/>
+                            </h:outputText>
+                        </f:facet>
                         <f:facet name="input"><p:inputText value="#{applicant.firstName}" style="width:100%" label="Year"/></f:facet>
                     </p:cellEditor>
                 </p:column>
@@ -51,24 +56,27 @@
                 </p:column>
                 <p:column headerText="DOB">
                     <p:cellEditor>
-                    <f:facet name="output">
-                        <h:outputText value="#{applicant.dob}">
-                            <f:convertDateTime type="date" pattern="MM/dd/yy"/>
-                        </h:outputText>
-                    </f:facet>
-                    <f:facet name="input">
-                        <p:calendar id="DOB" value="#{applicant.dob}" required="true" requiredMessage="Please provide first name"/>
-                    </f:facet>
+                        <f:facet name="output">
+                            <h:outputText value="#{applicant.dob}">
+                                <f:convertDateTime type="date" pattern="MM/dd/yy"/>
+                            </h:outputText>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:calendar id="DOB" value="#{applicant.dob}" required="true" requiredMessage="Please provide first name"/>
+                        </f:facet>
                     </p:cellEditor>
                 </p:column>
                 <p:column style="width:32px">
                     <p:rowEditor />
                 </p:column>
                 <p:column>
-                    <p:commandButton value="Edit" actionListener="#{formBean.initEdit}">
+                    <p:commandButton value="Edit" actionListener="#{formBean.initEdit}" 
+                                     update=":PEOPLE_EDT_FRM:WRAPPER" oncomplete="EDT_WGT.show()">
                         <f:param name="ID" value="#{applicant.firstName}"/>
                     </p:commandButton>
-                    <p:commandButton value="Remove"/>
+                    <p:commandButton value="Remove" actionListener="#{formBean.deleteApplicant}" update=":PEOPLE_FRM" ajax="true">
+                        <f:param name ="ID" value="#{applicant.firstName}"/>                    
+                    </p:commandButton>
                 </p:column>
             </p:dataTable>
         </h:form>
@@ -79,9 +87,11 @@
                     <ui:fragment rendered="#{formBean.applicant ne null}">
                         <h:panelGrid columns="3" id="EDT_PANE">
                             <h:outputLabel value="First Name"/>
-                            <p:inputText id="FN" value="#{formBean.applicant.firstName}" required="true" requiredMessage="Pleae provide first name"/>
+                            <p:inputText id="FN" value="#{formBean.applicant.firstName}" required="true" requiredMessage="Please provide first name"/>
                             <p:message for="FN"/>
-
+                            <h:outputLabel value="Last Name"/>
+                            <p:inputText id="LN" value="#{formBean.applicant.lastName}" required="true" requiredMessage="Please provide last name"/>
+                            <p:message for="LN"/>
                             <h:outputLabel value="Sex"/>
                             <p:selectOneMenu id="SEX" value="#{formBean.applicant.sex}" required="true">
                                 <f:selectItem itemValue="#{null}" itemLabel="Please Select a Value"/>
@@ -89,9 +99,8 @@
                                 <f:selectItem itemLabel="Female" itemValue="Female"/>
                             </p:selectOneMenu>
                             <p:message for="SEX"/>
-
                             <h:outputLabel value="DOB"/>
-                            <p:calendar id="DOB" value="#{formBean.applicant.dob}" required="true" requiredMessage="Pleae provide first name"/>
+                            <p:calendar id="DOB" value="#{formBean.applicant.dob}" required="true" requiredMessage="Please select DOB"/>
                             <p:message for="DOB"/>
 
                         </h:panelGrid>
@@ -100,7 +109,7 @@
                     <h:panelGrid columns="2">
                         <p:commandButton value="OK" actionListener="#{formBean.commitPeople}" update="EDT_PANE :PEOPLE_FRM:PEOPLE_LST" 
                                          oncomplete="handleEdit(xhr, status,args)"/>
-                        <p:commandButton value="Cancel"/>
+                        <p:commandButton value="Cancel" oncomplete="EDT_WGT.hide()"/>
                     </h:panelGrid>
                 </h:panelGrid>
 
