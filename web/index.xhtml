@@ -8,8 +8,8 @@
     <h:head>
         <title>Facelet Title</title>
         <script type="text/javascript">
-            function handleEdit(xhr, status,args){
-                if(!args.validationFailed){
+            function handleEdit(xhr, status, args) {
+                if (!args.validationFailed) {
                     EDT_WGT.hide();
                 }
             }
@@ -18,23 +18,57 @@
     <h:body>
         <h:form id="PEOPLE_FRM">
             <h:panelGrid columns="3" cellspacing="5px">
-                <p:commandButton value="Add" actionListener="#{formBean.initiateNewPeople}" update=":PEOPLE_EDT_FRM:WRAPPER" oncomplete="EDT_WGT.show()"/>
-                <p:commandButton id="EDT_BTN" value="Edit" disabled="#{formBean.applicant eq null}"/>
-                <p:commandButton value="Remove"/>
+                <p:commandButton value="Add" actionListener="#{formBean.initiateNewPeople}" update=":PEOPLE_EDT_FRM:WRAPPER" oncomplete="EDT_WGT.show()">
+                    <f:param name="EDT_MODE" value="ADD"/>
+                </p:commandButton>
+                <p:commandButton id="EDT_BTN" value="Edit" disabled="#{formBean.applicant eq null}"  actionListener="#{formBean.initiateNewPeople}" 
+                                 update=":PEOPLE_EDT_FRM:WRAPPER" oncomplete="EDT_WGT.show()">
+                    <f:param name="EDT_MODE" value="UPDATE"/>
+                </p:commandButton>
+                <p:commandButton id="RM_BTN" value="Remove" disabled="#{formBean.applicant eq null}"/>
             </h:panelGrid>
             <p:dataTable id="PEOPLE_LST" value="#{formBean.form.applicants}" var="applicant" 
-                          >
-                
+                         selectionMode="single" selection="#{formBean.applicant}" rowKey="#{applicant.firstName}"
+                         >
+                <p:ajax event="rowSelect" update=":PEOPLE_FRM:EDT_BTN :PEOPLE_FRM:RM_BTN"/>
                 <p:column headerText="Full Name">
-                    <h:outputText value="#{applicant.firstName}"/>
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{applicant.firstName}" /></f:facet>
+                        <f:facet name="input"><p:inputText value="#{applicant.firstName}" style="width:100%" label="Year"/></f:facet>
+                    </p:cellEditor>
                 </p:column>
                 <p:column headerText="Sex">
-                    <h:outputLabel value="#{applicant.sex eq 'M' ? 'Male' : 'Female'}"/>
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{applicant.sex}" /></f:facet>
+                        <f:facet name="input">
+                            <h:selectOneMenu value="#{applicant.sex}" style="width:100%">
+                                <f:selectItem itemLabel="Select One" itemValue="" />
+                                <f:selectItem itemLabel="Male" itemValue="Male" />
+                                <f:selectItem itemLabel="Female" itemValue="Female" />
+                            </h:selectOneMenu>
+                        </f:facet>
+                    </p:cellEditor>
                 </p:column>
                 <p:column headerText="DOB">
-                    <h:outputText value="#{applicant.dob}">
-                        <f:convertDateTime type="date" pattern="MM/dd/yy"/>
-                    </h:outputText>
+                    <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{applicant.dob}">
+                            <f:convertDateTime type="date" pattern="MM/dd/yy"/>
+                        </h:outputText>
+                    </f:facet>
+                    <f:facet name="input">
+                        <p:calendar id="DOB" value="#{applicant.dob}" required="true" requiredMessage="Please provide first name"/>
+                    </f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column style="width:32px">
+                    <p:rowEditor />
+                </p:column>
+                <p:column>
+                    <p:commandButton value="Edit" actionListener="#{formBean.initEdit}">
+                        <f:param name="ID" value="#{applicant.firstName}"/>
+                    </p:commandButton>
+                    <p:commandButton value="Remove"/>
                 </p:column>
             </p:dataTable>
         </h:form>
@@ -50,9 +84,9 @@
 
                             <h:outputLabel value="Sex"/>
                             <p:selectOneMenu id="SEX" value="#{formBean.applicant.sex}" required="true">
-                                <f:selectItem itemValue="#{null}" itemLabel="Plesel Select A value"/>
-                                <f:selectItem itemLabel="Male" itemValue="M"/>
-                                <f:selectItem itemLabel="Female" itemValue="F"/>
+                                <f:selectItem itemValue="#{null}" itemLabel="Please Select a Value"/>
+                                <f:selectItem itemLabel="Male" itemValue="Male"/>
+                                <f:selectItem itemLabel="Female" itemValue="Female"/>
                             </p:selectOneMenu>
                             <p:message for="SEX"/>
 
